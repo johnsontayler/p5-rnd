@@ -1,72 +1,40 @@
-let systems;
+let img;
+let background = false;
 
+function preload() {
+  img = loadImage("/assets/photo-1534796636912-3b95b3ab5986.jpg ");
+}
 function setup() {
-  createCanvas(1200, 900);
-  systems = [];
+  createCanvas(img.width, img.height);
+  // background(255, 255, 255);
+
+  // translucent stroke using alpha value
+  stroke("gray");
 }
 
 function draw() {
-  background(0);
-
-  for (let i = 0; i < systems.length; i++) {
-    systems[i].addParticle();
-    systems[i].run();
+  if (!background) {
+    image(img, 0, 0);
+    background = true;
   }
+
+  // draw two random chords each frame
+  randomChord();
+  randomChord();
+  randomChord();
 }
 
-function mousePressed() {
-  this.p = new ParticleSystem(createVector(mouseX, mouseY));
-  systems.push(p);
+function randomChord() {
+  // find a random point on a circle
+  let angle1 = random(0, 2 * PI);
+  let xpos1 = 300 + 300 * cos(angle1);
+  let ypos1 = 300 + 300 * sin(angle1);
+
+  // find another random point on the circle
+  let angle2 = random(0, 2 * PI);
+  let xpos2 = 300 + 300 * cos(angle2);
+  let ypos2 = 300 + 300 * sin(angle2);
+
+  // draw a line between them
+  line(xpos1, ypos1, xpos2, ypos2);
 }
-
-// A simple Particle class
-let Particle = function(position) {
-  this.acceleration = createVector(0, 0.05);
-  this.velocity = createVector(random(-1, 1), random(-1, 0));
-  this.position = position.copy();
-  this.lifespan = 255;
-};
-
-Particle.prototype.run = function() {
-  this.update();
-  this.display();
-};
-
-// Method to update position
-Particle.prototype.update = function() {
-  this.velocity.add(this.acceleration);
-  this.position.add(this.velocity);
-  this.lifespan -= 2;
-};
-
-// Method to display
-Particle.prototype.display = function() {
-  stroke(200, this.lifespan);
-  strokeWeight(2);
-  fill(127, this.lifespan);
-  ellipse(this.position.x, this.position.y, 12, 12);
-};
-
-// Is the particle still useful?
-Particle.prototype.isDead = function() {
-  return this.lifespan < 0;
-};
-
-let ParticleSystem = function(position) {
-  this.origin = position.copy();
-  this.particles = [];
-};
-
-ParticleSystem.prototype.addParticle = function() {
-  this.particles.push(new Particle(this.origin));
-};
-
-ParticleSystem.prototype.run = function() {
-  for (let i = this.particles.length - 1; i >= 0; i--) {
-    let p = this.particles[i];
-    p.run();
-    if (p.isDead()) {
-      this.particles.splice(i, 1);
-    }
-  }
-};
